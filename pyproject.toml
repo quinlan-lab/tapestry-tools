@@ -1,0 +1,24 @@
+[project]
+name = "tapestry-tools"
+version = "0.1.0"
+description = "A suite of bioinformatics tools for tapestry analysis"
+readme = "README.md"
+authors = [
+    { name = "petermchale", email = "peter.thomas.mchale@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "bioframe>=0.8.0",
+    "polars>=1.36.1",
+    "rich-argparse>=1.7.2",
+    "tqdm>=4.67.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
+
+[project.scripts]
+# Command Name            = "PythonFile:Function"
+call-imprinted-loci       = "tapestry_tools.call_imprinted_loci:main"
+compute-delta-methylation = "tapestry_tools.compute_delta_methylation:main"
