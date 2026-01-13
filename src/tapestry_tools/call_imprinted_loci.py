@@ -18,11 +18,13 @@ def main():
     # Input/Output
     parser.add_argument(
         "--delta-meth-bed", 
+        required=True, 
         type=str, 
         help="Path to the input BED file containing delta methylation data."
     )
     parser.add_argument(
         "--imprinted-bed", 
+        required=True, 
         type=str, 
         help="Path to save the candidate imprinted loci."
     )
