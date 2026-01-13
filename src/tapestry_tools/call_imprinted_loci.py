@@ -56,11 +56,6 @@ def main():
         default=0.5, 
         help="Minimum fraction of CpGs per haplotype that are valid."
     )
-    parser.add_argument(
-        "--no-header",
-        action="store_true",
-        help="Do not write a header row to the output file."
-    )
 
     # Logic: If no arguments are passed, print help and exit
     if len(sys.argv) == 1:
@@ -79,18 +74,13 @@ def main():
         valid_cpg_ratio_threshold=args.min_valid_cpg_ratio
     )
 
-
-    # We save as TSV because the 'imprinted_samples' column is a list, 
-    # which CSV/TSV handles by stringifying (e.g. "['SampleA', 'SampleB']").
-    # This format is easy to parse later in R, Python, or standard text tools.
+    df_candidates = df_candidates.with_columns(
+        pl.col("imprinted_samples").list.join(",") 
+    )
 
     imprinted_bed = Path(args.imprinted_bed)
     imprinted_bed.parent.mkdir(parents=True, exist_ok=True)
     imprinted_bed = str(imprinted_bed)
-
-    df_candidates = df_candidates.with_columns(
-        pl.col("imprinted_samples").list.join(",") 
-    )
 
     write_dataframe_to_bed(df_candidates, imprinted_bed, source=__file__)
 
