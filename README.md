@@ -15,7 +15,7 @@ Check that `call-imprinted-loci` tool is available:
 call-imprinted-loci
 ```
 
-Call imprinted loci: 
+Given a set of methylation differences between haplotypes for a set of genomic tiles and a set of samples, call imprinted loci: 
 ```
 call-imprinted-loci \
     --delta-meth-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/delta_meth_all_samples.bed \
