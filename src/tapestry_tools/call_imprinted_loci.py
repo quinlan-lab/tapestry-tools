@@ -8,6 +8,7 @@ import sys
 
 from .read_data import read_dataframe_from_bed
 from .imprinting import call_imprinted_loci
+from .write_data import write_dataframe_to_bed
 
 def main():
     parser = argparse.ArgumentParser(
@@ -85,18 +86,13 @@ def main():
 
     imprinted_bed = Path(args.imprinted_bed)
     imprinted_bed.parent.mkdir(parents=True, exist_ok=True)
+    imprinted_bed = str(imprinted_bed)
 
-    ( 
-        df_candidates
-        .with_columns(
-            pl.col("imprinted_samples").list.join(",") 
-        )
-        .write_csv(
-            imprinted_bed, 
-            separator='\t', 
-            include_header=not args.no_header
-        )
+    df_candidates = df_candidates.with_columns(
+        pl.col("imprinted_samples").list.join(",") 
     )
+
+    write_dataframe_to_bed(df_candidates, imprinted_bed, source=__file__)
 
 if __name__ == "__main__":
     main()
