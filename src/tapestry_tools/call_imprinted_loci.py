@@ -11,9 +11,12 @@ from .imprinting import call_imprinted_loci
 from .write_data import write_dataframe_to_bed
 
 def main():
+    class RichDefaultsFormatter(RichHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
+        pass
+
     parser = argparse.ArgumentParser(
         description="Call imprinted loci from a BED file of haplotype-specific methylation differences for a set of samples.",
-        formatter_class=RichHelpFormatter
+        formatter_class=RichDefaultsFormatter
     )
 
     # Input/Output
