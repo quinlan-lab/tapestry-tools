@@ -3,7 +3,10 @@
 Install `uv`: 
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
 ```
+
+Additionally, prior to installation, you may need to specify a directory for `TMPDIR` that you have write access to. 
 
 Install `tapestry-tools`: 
 ```
