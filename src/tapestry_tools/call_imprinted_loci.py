@@ -4,6 +4,7 @@ import argparse
 from rich_argparse import RichHelpFormatter
 from pathlib import Path
 import polars as pl 
+import sys 
 
 from .read_data import read_dataframe_from_bed
 from .imprinting import call_imprinted_loci
@@ -57,6 +58,11 @@ def main():
         action="store_true",
         help="Do not write a header row to the output file."
     )
+
+    # Logic: If no arguments are passed, print help and exit
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stdout)
+        sys.exit(1)
 
     args = parser.parse_args()
 
