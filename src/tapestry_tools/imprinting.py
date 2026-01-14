@@ -4,11 +4,11 @@ import polars as pl
 import polars.selectors as cs
 
 from .tile import get_tiles 
-from .get_palladium_prefixes import get_prefixes_wrapper
 from .read_data import read_tapestry
 from .methylation import compute_methylation
 from .version_sort import version_sort
 from .prefix_columns import prefix_columns
+from .get_samples_and_paths import get_samples_and_paths
 
 def compute_delta_methylation(df): 
     # List of the metric types you want to calculate a delta for
@@ -29,19 +29,13 @@ def compute_delta_methylation(df):
 
     return df 
 
-def compute_delta_methylation_all_samples(reference_genome, tile_size, meth_read_phased_dir, testing): 
+def compute_delta_methylation_all_samples(reference_genome, tile_size, sample_meth_beds, testing): 
     df_tiles = get_tiles(reference_genome, tile_size)
-    prefixes = get_prefixes_wrapper()
-    if testing: 
-        print('[Testing] Using only 2 samples')
-        prefixes = prefixes[:2]
-    else: 
-        print('[Production] Using all samples')
-    print(f"Samples: {prefixes}")
+
+    sample_ids, meth_file_paths = get_samples_and_paths(sample_meth_beds, testing)
 
     df_all_samples = None
-    for prefix in tqdm(prefixes):
-        bed_meth = f"{meth_read_phased_dir}/{prefix}.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz"
+    for sample_id, bed_meth in tqdm(zip(sample_ids, meth_file_paths)):
         if Path(bed_meth).exists():
             df_meth = read_tapestry(bed_meth)
         else: 
@@ -72,7 +66,7 @@ def compute_delta_methylation_all_samples(reference_genome, tile_size, meth_read
                 'delta_of_model_based_meth': 'model',
             })
         )
-        df_tiles_with_delta_meth = prefix_columns(df_tiles_with_delta_meth, prefix=prefix, join_keys=join_keys)
+        df_tiles_with_delta_meth = prefix_columns(df_tiles_with_delta_meth, prefix=sample_id, join_keys=join_keys)
 
         if df_all_samples is None:
             df_all_samples = df_tiles_with_delta_meth

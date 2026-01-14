@@ -4,9 +4,9 @@ from tqdm import tqdm
 from pathlib import Path 
 
 from .version_sort import version_sort
-from .get_palladium_prefixes import get_prefixes_wrapper
 from .read_data import read_tapestry
 from .prefix_columns import prefix_columns
+from .get_samples_and_paths import get_samples_and_paths
 
 def generate_methylation_expressions():
     """
@@ -90,14 +90,13 @@ def compute_methylation(df_intervals, df_meth, aggregation_expressions=generate_
         }) 
     )
 
-def compute_methylation_all_samples_at_given_loci(df_loci, meth_read_phased_dir): 
+def compute_methylation_all_samples_at_given_loci(df_loci, sample_meth_beds, testing): 
     df_loci = df_loci.select(['chrom', 'start', 'end'])
 
-    prefixes = get_prefixes_wrapper()
-    # prefixes = prefixes[:2] # TESTING
+    sample_ids, meth_file_paths = get_samples_and_paths(sample_meth_beds, testing)
+
     df_all_samples = None
-    for prefix in tqdm(prefixes):
-        bed_meth = f"{meth_read_phased_dir}/{prefix}.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz"
+    for sample_id, bed_meth in tqdm(zip(sample_ids, meth_file_paths)):
         if Path(bed_meth).exists():
             df_meth = read_tapestry(bed_meth)
         else: 
@@ -115,7 +114,7 @@ def compute_methylation_all_samples_at_given_loci(df_loci, meth_read_phased_dir)
             'founder_mat'
         ])
         join_keys = ['chrom', 'start', 'end']
-        df_loci_with_meth = prefix_columns(df_loci_with_meth, prefix=prefix, join_keys=join_keys)
+        df_loci_with_meth = prefix_columns(df_loci_with_meth, prefix=sample_id, join_keys=join_keys)
 
         if df_all_samples is None:
             df_all_samples = df_loci_with_meth
