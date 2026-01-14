@@ -62,8 +62,6 @@ def compute_delta_methylation_all_samples(reference_genome, tile_size, sample_me
                 'num_cpgs_with_non_null_count_based_meth': 'num_valid_cpgs',
                 'num_cpgs_with_non_null_count_based_meth_pat': 'num_valid_cpgs_pat',
                 'num_cpgs_with_non_null_count_based_meth_mat': 'num_valid_cpgs_mat',
-                'delta_of_count_based_meth': 'count',
-                'delta_of_model_based_meth': 'model',
             })
         )
         df_tiles_with_delta_meth = prefix_columns(df_tiles_with_delta_meth, prefix=sample_id, join_keys=join_keys)
