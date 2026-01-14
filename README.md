@@ -46,3 +46,11 @@ call-imprinted-loci \
     --delta-meth-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/delta-meth.all-samples.bed \
     --imprinted-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/imprinted-candidates.all-samples.bed
 ```
+
+Given a set of loci (e.g., imprinted loci), and a set of samples, compute founder-phased methylation averaged over CpGs in each locus: 
+```
+compute-methylation-loci \
+    --loci-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/imprinted-candidates.all-samples.bed \
+    --sample-meth-beds /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/all-cpgs.all-samples.tsv \
+    --loci-meth-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/imprinted-candidates.all-samples.meth.bed
+```

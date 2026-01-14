@@ -4,7 +4,7 @@ from tqdm import tqdm
 from pathlib import Path 
 
 from .version_sort import version_sort
-from .read_data import read_tapestry
+from .read_data import (read_tapestry, read_dataframe_from_bed)
 from .prefix_columns import prefix_columns
 from .get_samples_and_paths import get_samples_and_paths
 
@@ -90,7 +90,8 @@ def compute_methylation(df_intervals, df_meth, aggregation_expressions=generate_
         }) 
     )
 
-def compute_methylation_all_samples_at_given_loci(df_loci, sample_meth_beds, testing): 
+def compute_methylation_all_samples_at_given_loci(loci_bed, sample_meth_beds, testing): 
+    df_loci = read_dataframe_from_bed(loci_bed)
     df_loci = df_loci.select(['chrom', 'start', 'end'])
 
     sample_ids, meth_file_paths = get_samples_and_paths(sample_meth_beds, testing)
@@ -106,12 +107,21 @@ def compute_methylation_all_samples_at_given_loci(df_loci, sample_meth_beds, tes
             continue
 
         df_loci_with_meth = compute_methylation(df_loci, df_meth)
+        df_loci_with_meth = df_loci_with_meth.with_columns(
+            pl
+            .when(pl.col("founder_pat").list.len() > 0)
+            .then(pl.col("founder_pat").list.join(","))
+            .otherwise(None),
+            pl
+            .when(pl.col("founder_mat").list.len() > 0)
+            .then(pl.col("founder_mat").list.join(","))
+            .otherwise(None),
+        )
+
         df_loci_with_meth = df_loci_with_meth.drop([
             'num_cpgs', 
             'count_based_meth', 
             'model_based_meth', 
-            'founder_pat', 
-            'founder_mat'
         ])
         join_keys = ['chrom', 'start', 'end']
         df_loci_with_meth = prefix_columns(df_loci_with_meth, prefix=sample_id, join_keys=join_keys)
