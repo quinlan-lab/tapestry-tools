@@ -1,5 +1,7 @@
 # tapestry-tools
 
+## Installation 
+
 Install `uv`: 
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -17,6 +19,8 @@ Check that `compute-delta-methylation` tool is available:
 ```
 compute-delta-methylation
 ```
+
+## Imprinting 
 
 Test the computation of methylation difference between haplotypes for multiple samples:
 ```
