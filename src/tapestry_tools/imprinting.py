@@ -89,13 +89,13 @@ def format_locus(df):
     )
 
 def call_imprinted_loci(df, meth_mode, delta_meth_threshold, num_valid_cpgs_per_hap_threshold, valid_cpg_ratio_threshold):
-    delta_meth_cols = [col for col in df.columns if col.endswith(f"_{meth_mode}")]
+    delta_meth_cols = [col for col in df.columns if col.endswith(f"_delta_of_{meth_mode}_based_meth")]
 
     # List to store expressions that return the 'prefix' (sample name) if 'condition' (see below) is met
     sample_match_exprs = []
     
     for delta_meth_col in delta_meth_cols:
-        prefix = delta_meth_col.removesuffix(f"_{meth_mode}")
+        prefix = delta_meth_col.removesuffix(f"_delta_of_{meth_mode}_based_meth")
         num_cpgs_col = f"{prefix}_num_cpgs"
         num_valid_cpgs_pat_col = f"{prefix}_num_valid_cpgs_pat"
         num_valid_cpgs_mat_col = f"{prefix}_num_valid_cpgs_mat"
