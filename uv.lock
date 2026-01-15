@@ -1061,6 +1061,7 @@ source = { editable = "." }
 dependencies = [
     { name = "bioframe" },
     { name = "ipykernel" },
+    { name = "matplotlib" },
     { name = "openpyxl" },
     { name = "polars" },
     { name = "pyarrow" },
@@ -1072,6 +1073,7 @@ dependencies = [
 requires-dist = [
     { name = "bioframe", specifier = ">=0.8.0" },
     { name = "ipykernel", specifier = ">=7.1.0" },
+    { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "polars", specifier = ">=1.36.1" },
     { name = "pyarrow", specifier = ">=22.0.0" },
