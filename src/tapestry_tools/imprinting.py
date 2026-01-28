@@ -91,7 +91,6 @@ def format_locus(df):
 def call_imprinted_loci(df, meth_mode, delta_meth_threshold, num_valid_cpgs_per_hap_threshold, valid_cpg_ratio_threshold):
     delta_meth_cols = [col for col in df.columns if col.endswith(f"_delta_of_{meth_mode}_based_meth")]
 
-    # List to store expressions that return the 'prefix' (sample name) if 'condition' (see below) is met
     sample_match_exprs = []
     
     for delta_meth_col in delta_meth_cols:
@@ -100,42 +99,82 @@ def call_imprinted_loci(df, meth_mode, delta_meth_threshold, num_valid_cpgs_per_
         num_valid_cpgs_pat_col = f"{prefix}_num_valid_cpgs_pat"
         num_valid_cpgs_mat_col = f"{prefix}_num_valid_cpgs_mat"
 
-        condition = (
-            (pl.col(delta_meth_col).abs() > delta_meth_threshold) & 
+        is_significant = pl.col(delta_meth_col).abs() > delta_meth_threshold
+        has_enough_cpgs = (
             (pl.col(num_valid_cpgs_pat_col) >= num_valid_cpgs_per_hap_threshold) & 
-            (pl.col(num_valid_cpgs_mat_col) >= num_valid_cpgs_per_hap_threshold) &
+            (pl.col(num_valid_cpgs_mat_col) >= num_valid_cpgs_per_hap_threshold)
+        )
+        has_good_ratio = (
             ((pl.col(num_valid_cpgs_pat_col) / pl.col(num_cpgs_col)) > valid_cpg_ratio_threshold) &
             ((pl.col(num_valid_cpgs_mat_col) / pl.col(num_cpgs_col)) > valid_cpg_ratio_threshold)
         )
 
-        # If 'condition' is True, return the sample name (prefix); otherwise return null
-        sample_match_exprs.append(
-            pl.when(condition).then(pl.lit(prefix)).otherwise(None)
+        condition = is_significant & has_enough_cpgs & has_good_ratio
+
+        # Determine the methylated allele based on the sign of delta_meth
+        # Assumes delta = Pat - Mat
+        allele_label = (
+            pl
+            .when(pl.col(delta_meth_col) > 0)
+            .then(pl.lit(f"{prefix}:Pat"))
+            .otherwise(pl.lit(f"{prefix}:Mat"))
         )
 
-    df= format_locus(
+        # Append labeled string if condition is met, else null
+        sample_match_exprs.append(
+            pl.when(condition).then(allele_label).otherwise(None)
+        )
+
+    df = format_locus(
         df
         .with_columns(
-            # Combine all sample checks into one list column and remove non-matches (nulls)
-            pl.concat_list(sample_match_exprs).list
+            pl
+            .concat_list(sample_match_exprs).list
             .drop_nulls()
             .alias("imprinted_samples")
         )
-        # Filter to keep only rows where at least one sample matched
         .filter(pl.col("imprinted_samples").list.len() > 0)
         .with_columns(
             pl.col("imprinted_samples").list.len().alias("num_imprinted_samples")
         )
+        .with_columns(
+            # Count how many samples are Paternal-methylated at this locus
+            pl
+            .col("imprinted_samples").list.eval(
+                pl.element().str.contains(":Pat")
+            )
+            .list.sum()
+            .alias("count_pat_meth"),
+            
+            # Count how many samples are Maternal-methylated
+            pl
+            .col("imprinted_samples").list.eval(
+                pl.element().str.contains(":Mat")
+            )
+            .list.sum()
+            .alias("count_mat_meth")
+        )
+        .with_columns(
+            # Determine the consensus direction
+            pl
+            .when((pl.col("count_pat_meth") > 0) & (pl.col("count_mat_meth") == 0))
+            .then(pl.lit("Consistent Paternal"))
+            .when((pl.col("count_mat_meth") > 0) & (pl.col("count_pat_meth") == 0))
+            .then(pl.lit("Consistent Maternal"))
+            .otherwise(pl.lit("Discordant/Mixed"))
+            .alias("imprinting_consensus")
+        )        
         .select(
             'chrom',
             'start', 
             'end',
             'imprinted_samples',
             'num_imprinted_samples',
-            # cs.contains("NA12885") # TESTING 
+            'count_pat_meth',
+            'count_mat_meth',
+            'imprinting_consensus'
         )
     )
 
     print(f"Number of candidate imprinted loci: {len(df)}")
-    return df
-    
+    return df 
