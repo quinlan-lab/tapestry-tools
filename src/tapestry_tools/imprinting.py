@@ -144,7 +144,7 @@ def call_imprinted_loci(df, meth_mode, delta_meth_threshold, num_valid_cpgs_per_
                 pl.element().str.contains(":Pat")
             )
             .list.sum()
-            .alias("count_pat_meth"),
+            .alias("num_imprinted_samples_pat_meth"),
             
             # Count how many samples are Maternal-methylated
             pl
@@ -152,27 +152,16 @@ def call_imprinted_loci(df, meth_mode, delta_meth_threshold, num_valid_cpgs_per_
                 pl.element().str.contains(":Mat")
             )
             .list.sum()
-            .alias("count_mat_meth")
+            .alias("num_imprinted_samples_mat_meth")
         )
-        .with_columns(
-            # Determine the consensus direction
-            pl
-            .when((pl.col("count_pat_meth") > 0) & (pl.col("count_mat_meth") == 0))
-            .then(pl.lit("Consistent Paternal"))
-            .when((pl.col("count_mat_meth") > 0) & (pl.col("count_pat_meth") == 0))
-            .then(pl.lit("Consistent Maternal"))
-            .otherwise(pl.lit("Discordant/Mixed"))
-            .alias("imprinting_consensus")
-        )        
         .select(
             'chrom',
             'start', 
             'end',
             'imprinted_samples',
             'num_imprinted_samples',
-            'count_pat_meth',
-            'count_mat_meth',
-            'imprinting_consensus'
+            'num_imprinted_samples_pat_meth',
+            'num_imprinted_samples_mat_meth',
         )
     )
 
