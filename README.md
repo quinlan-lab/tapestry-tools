@@ -54,3 +54,7 @@ compute-methylation-loci \
     --sample-meth-beds /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/all-cpgs.all-samples.tsv \
     --loci-meth-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/imprinted-candidates.all-samples.meth.bed
 ```
+
+## Liftover genomic coordinates 
+
+Some of the experiments require one to liftover coordinates of published meQTLs from hg19 to hg38. `lift-over` is a utility to do that. 
