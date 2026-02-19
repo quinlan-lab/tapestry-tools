@@ -55,6 +55,31 @@ compute-methylation-loci \
     --loci-meth-bed /scratch/ucgd/lustre-labs/quinlan/data-shared/tapestry-tools/CEPH1463.GRCh38.hifi.founder-phased/imprinted-candidates.all-samples.meth.bed
 ```
 
-## Liftover genomic coordinates 
+## Other general-purpose utilities 
 
-Some of the experiments require one to liftover coordinates of published meQTLs from hg19 to hg38. `lift-over` is a utility to do that. 
+### Clean genomic coordinates
+
+Convert genomic coordinates from colon-separated format to tab-separated BED format:
+
+```
+clean-coords "chr1:153,617,723-153,617,921"
+```
+
+Output:
+```
+chr1	153617723	153617921
+```
+
+### Liftover genomic coordinates 
+
+Lift over genomic coordinates from one reference genome to another (e.g., hg19 to hg38). Supports both single coordinates and BED file input:
+
+```
+lift-over --old-ref hg19 --new-ref hg38 --coord "chr1:1000000-1000100"
+```
+
+Or with a BED file:
+
+```
+lift-over --old-ref hg19 --new-ref hg38 --input-bed input.bed --output-bed output.bed
+```
