@@ -72,14 +72,7 @@ chr1	153617723	153617921
 
 ### Liftover genomic coordinates 
 
-Lift over genomic coordinates from one reference genome to another (e.g., hg19 to hg38). Supports both single coordinates and BED file input:
-
+Lift over genomic coordinates from one reference genome to another (e.g., hg19 to hg38)
 ```
 lift-over --old-ref hg19 --new-ref hg38 --coord "chr1:1000000-1000100"
-```
-
-Or with a BED file:
-
-```
-lift-over --old-ref hg19 --new-ref hg38 --input-bed input.bed --output-bed output.bed
 ```

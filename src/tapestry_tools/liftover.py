@@ -2,12 +2,49 @@
 
 import argparse
 from rich_argparse import RichHelpFormatter
-from pathlib import Path
-import polars as pl
 import sys
+from pyliftover import LiftOver
 
-from .read_data import read_dataframe_from_bed
-from .write_data import write_dataframe_to_bed
+
+def lift_coord(lo, chrom, start, end):
+    converted_start = lo.convert_coordinate(chrom, start - 1)
+    converted_end = lo.convert_coordinate(chrom, end - 1) if end != start + 1 else None
+
+    if converted_start and len(converted_start) > 0:
+        new_chrom, new_start = converted_start[0][:2]
+        new_start_bed = new_start + 1
+        if converted_end and len(converted_end) > 0:
+            new_end_bed = converted_end[0][1] + 1
+            print(f"{new_chrom}\t{new_start_bed}\t{new_end_bed}")
+        else:
+            print(f"{new_chrom}\t{new_start_bed}\t{new_start_bed + 1}")
+
+
+def parse_coordinate(coord_str):
+    coord_str = coord_str.replace(",", "")  # clean IGV-style coordinate formatting
+    parts = coord_str.split(":")
+    if len(parts) != 2:
+        sys.stderr.write(
+            f"Error: Invalid coordinate format '{coord_str}'. Expected 'chr:start' or 'chr:start-end'.\n"
+        )
+        sys.exit(1)
+
+    chrom = parts[0]
+    range_parts = parts[1].split("-")
+
+    if len(range_parts) == 1:
+        start = int(range_parts[0])
+        end = start + 1
+    elif len(range_parts) == 2:
+        start = int(range_parts[0])
+        end = int(range_parts[1])
+    else:
+        sys.stderr.write(
+            f"Error: Invalid coordinate format '{coord_str}'. Expected 'chr:start' or 'chr:start-end'.\n"
+        )
+        sys.exit(1)
+
+    return chrom, start, end
 
 
 def main():
@@ -34,16 +71,9 @@ def main():
         help="New reference genome (e.g., 'hg38', 'mm10').",
     )
     parser.add_argument(
-        "--input-bed",
-        required=True,
+        "--coord",
         type=str,
-        help="Input BED file with chrom, start, end columns (0-based).",
-    )
-    parser.add_argument(
-        "--output-bed",
-        required=True,
-        type=str,
-        help="Path to save the lifted-over coordinates as a BED file.",
+        help="Single coordinate in format 'chr:start' or 'chr:start-end'.",
     )
 
     if len(sys.argv) == 1:
@@ -52,52 +82,12 @@ def main():
 
     args = parser.parse_args()
 
-    from pyliftover import LiftOver
-
     lo = LiftOver(args.old_ref, args.new_ref)
 
-    df = read_dataframe_from_bed(args.input_bed)
+    chrom, start, end = parse_coordinate(args.coord)
+    
+    lift_coord(lo, chrom, start, end)
 
-    converted_rows = []
-    for row in df.iter_rows(named=True):
-        chrom = row["chrom"]
-        start = row["start"]
-        end = row["end"]
 
-        result = lo.convert_coordinate(chrom, start)
-
-        if result is not None and len(result) > 0:
-            for r in result:
-                new_chrom, new_pos, strand, original_pos = r
-                converted_rows.append(
-                    {
-                        "chrom": new_chrom,
-                        "start": new_pos,
-                        "end": new_pos + 1,
-                        "original_chrom": chrom,
-                        "original_start": start,
-                        "original_end": end,
-                        "strand": strand,
-                        "original_pos": original_pos,
-                    }
-                )
-        else:
-            converted_rows.append(
-                {
-                    "chrom": chrom,
-                    "start": start,
-                    "end": start + 1,
-                    "original_chrom": chrom,
-                    "original_start": start,
-                    "original_end": end,
-                    "strand": ".",
-                    "original_pos": start,
-                }
-            )
-
-    df_converted = pl.DataFrame(converted_rows)
-
-    output_path = Path(args.output_bed)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    write_dataframe_to_bed(df_converted, str(output_path), source=__file__)
+if __name__ == "__main__":
+    main()
