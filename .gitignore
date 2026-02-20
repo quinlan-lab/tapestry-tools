@@ -10,3 +10,4 @@ wheels/
 .venv
 
 .trash 
+.ruff_cache
