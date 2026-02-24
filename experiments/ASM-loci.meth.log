@@ -1,0 +1,24 @@
+nohup: ignoring input
+[Production] Using all samples
+Samples: ['NA12877', 'NA12878', 'NA12887', 'NA12885', 'NA12883', 'NA12881', 'NA12879', 'NA12886', 'NA12884', 'NA12882', 'NA12892', 'NA12891', 'NA12890', 'NA12889', '200080', '200081', '200082', '200084', '200085', '200086', '200087', '200100', '200101', '200102', '200103', '200104', '200105', '200106']
+0it [00:00, ?it/s]1it [00:23, 23.73s/it]2it [00:41, 20.27s/it]3it [00:59, 18.97s/it]4it [01:15, 17.90s/it]5it [01:32, 17.53s/it]6it [01:47, 16.81s/it]7it [02:02, 16.26s/it]8it [02:17, 15.82s/it]9it [02:33, 15.90s/it]10it [02:50, 16.31s/it]16it [03:08,  6.58s/it]17it [03:24,  7.93s/it]18it [03:40,  9.35s/it]19it [03:56, 10.66s/it]20it [04:11, 11.74s/it]21it [04:26, 12.62s/it]23it [04:42, 10.71s/it]24it [04:58, 11.85s/it]25it [05:14, 12.79s/it]26it [05:30, 13.58s/it]27it [05:45, 14.17s/it]28it [06:01, 14.55s/it]28it [06:01, 12.91s/it]
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/NA12892.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/NA12891.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/NA12890.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/NA12889.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/200080.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Could not read CpG sites at which count- and model-based methylation levels have been phased to founder haplotypes
+Required file does not exist: '/scratch/ucgd/lustre-labs/quinlan/data-shared/dna-methylation/CEPH1463.GRCh38.hifi.founder-phased.all-cpgs/200100.dna-methylation.founder-phased.all_cpgs.sorted.bed.gz'
+This may be because this sample is a founder and therefore cannot be inheritance-based phased
+Wrote 'experiments/ASM-loci.meth.bed'
+Done running '/scratch/ucgd/lustre-labs/quinlan/u6018199/tapestry-tools/src/tapestry_tools/compute_methylation_at_given_loci.py'

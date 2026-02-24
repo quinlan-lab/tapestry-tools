@@ -33,8 +33,7 @@ def get_parental_df(df_long, mode, parent_type, base_cols):
     target_founder = f"founder{suffix}"
 
     return (
-        df_long
-        .filter(pl.col("metric").is_in([target_meth, target_founder]))
+        df_long.filter(pl.col("metric").is_in([target_meth, target_founder]))
         .pivot(index=base_cols + ["sample"], on="metric", values="value")
         .select(
             [
@@ -48,8 +47,8 @@ def get_parental_df(df_long, mode, parent_type, base_cols):
 
 def correlate_methylation_with_haplotypes(mode="count"):
     """
-    Plot methylation vs founder haplotype (coloring by parent) 
-    and methylation vs parent (coloring by founder haplotype) 
+    Plot methylation vs founder haplotype (coloring by parent)
+    and methylation vs parent (coloring by founder haplotype)
     for each locus.
 
     Args:
@@ -76,7 +75,20 @@ def correlate_methylation_with_haplotypes(mode="count"):
     )
     df = df.join(SNPs, on=["chrom", "start", "end"], how="left")
 
-    base_cols = ["chrom", "start", "end", "SNP"]
+    # Add gene column from original ASM-loci.bed
+    genes = (
+        pl.read_csv(
+            "ASM-loci.bed",
+            separator="\t",
+            comment_prefix="##",
+            null_values=["", "null"],
+        )
+        .rename({"#chrom": "chrom"})
+        .select(["chrom", "start", "end", "gene"])
+    )
+    df = df.join(genes, on=["chrom", "start", "end"], how="left")
+
+    base_cols = ["chrom", "start", "end", "SNP", "gene"]
     df_long = df.unpivot(
         index=base_cols, variable_name="raw_column", value_name="value"
     )
@@ -118,11 +130,13 @@ def correlate_methylation_with_haplotypes(mode="count"):
     # Plotting Loop
     for row in df.iter_rows(named=True):
         snp_id = row.get("SNP", "")
+        gene = row.get("gene", "")
         locus_name = f"{row['chrom']}:{row['start']}-{row['end']}"
+        title = f"Locus to compute methylation: {locus_name}"
         if snp_id:
-            title = f"Locus to compute methylation: {locus_name}<br>meQTL: {snp_id}"
-        else:
-            title = f"Locus to compute methylation: {locus_name}<br>meQTL: N/A"
+            title += f"<br>meQTL: {snp_id}"
+        if gene:
+            title += f"<br>Gene: {gene}"
 
         print(title.replace("<br>", "\n"))
 
@@ -160,9 +174,10 @@ def correlate_methylation_with_haplotypes(mode="count"):
             legend_title="Parent of origin",
             bargap=0.1,
             width=1000,
-            height=600,
+            height=800,
             title_y=0.95,
             title_font_size=30,
+            margin=dict(t=150),
             plot_bgcolor="white",
             paper_bgcolor="white",
             xaxis=dict(linecolor="black", gridcolor="lightgray"),
@@ -194,9 +209,10 @@ def correlate_methylation_with_haplotypes(mode="count"):
             legend_title="Founder haplotype",
             bargap=0.1,
             width=1000,
-            height=600,
+            height=800,
             title_y=0.95,
             title_font_size=30,
+            margin=dict(t=150),
             plot_bgcolor="white",
             paper_bgcolor="white",
             xaxis=dict(linecolor="black", gridcolor="lightgray"),
