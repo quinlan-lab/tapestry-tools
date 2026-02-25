@@ -8,7 +8,7 @@ import plotly.io as pio
 # https://g.co/gemini/share/3898a74b2d77
 FONT_FAMILY = "Arial"
 
-FONT_SIZE = 25
+FONT_SIZE = 35
 
 plt.rcParams["font.family"] = FONT_FAMILY
 plt.rcParams["font.sans-serif"] = [FONT_FAMILY]
@@ -167,7 +167,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
             category_orders={"founder": sorted(locus_df["founder"].unique())},
         )
 
-        fig1.update_traces(marker_size=15)
+        fig1.update_traces(marker_size=25)
 
         fig1.update_layout(
             yaxis_range=[0, 1],
@@ -202,7 +202,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
             color_discrete_map=haplotype_color_map,
         )
 
-        fig2.update_traces(marker_size=15, jitter=0.3, pointpos=0)
+        fig2.update_traces(marker_size=25, jitter=0.3, pointpos=0)
 
         fig2.update_layout(
             yaxis_range=[0, 1],
