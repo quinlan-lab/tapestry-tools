@@ -26,7 +26,13 @@ print(f"PYTHONPATH: {os.environ.get('PYTHONPATH')}")
 pl.Config.set_tbl_rows(10)
 
 
-def save_methylation_vs_founder_by_allele(fig, snp_id, outdir="figures"):
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_FIG_DIR = os.path.normpath(
+    os.path.join(REPO_ROOT, "..", "tapestry", "manuscript", "fig5")
+)
+
+
+def save_methylation_vs_founder_by_allele(fig, snp_id, outdir=DEFAULT_FIG_DIR):
     """Save a methylation-vs-founder plot (colored by meQTL allele) to disk,
     with a filename that includes the rsID."""
     os.makedirs(outdir, exist_ok=True)
