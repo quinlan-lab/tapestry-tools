@@ -17,11 +17,11 @@ PY="$REPO/.venv/bin/python"
 
 VCF="${VCF:-/scratch/ucgd/lustre-labs/quinlan/data-shared/haplotype-maps/CEPH1463.GRCh38/CEPH1463.GRCh38.pass.sorted.vcf.gz}"
 
-echo "[1/2] enriching ASM-loci.bed with meQTL coords from Ensembl"
+echo "[1/3] enriching ASM-loci.bed with meQTL coords from Ensembl"
 "$PY" "$HERE/enrich_asm_loci_with_meqtl_coords.py"
 
 echo
-echo "[2/2] verifying meQTL alleles against $VCF"
+echo "[2/3] verifying meQTL alleles against $VCF"
 if ! command -v bcftools >/dev/null 2>&1; then
     echo "  bcftools not on PATH; skipping verification." >&2
     echo "  Re-run this script on a host with bcftools and the VCF visible." >&2
@@ -35,3 +35,10 @@ fi
 "$PY" "$HERE/verify_meqtl_alleles_against_vcf.py" \
     --vcf "$VCF" \
     --write-out "$HERE/ASM-loci.meQTL.bed"
+
+echo
+echo "[3/3] extracting per-sample phased alleles at each meQTL"
+"$PY" "$HERE/extract_meqtl_alleles_from_vcf.py" \
+    --vcf "$VCF" \
+    --bed "$HERE/ASM-loci.meQTL.bed" \
+    --out "$HERE/meqtl_alleles.tsv"
