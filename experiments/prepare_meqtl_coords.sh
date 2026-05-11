@@ -32,4 +32,6 @@ if [[ ! -r "$VCF" ]]; then
     echo "  Set VCF=<path> and re-run on a host that can see it." >&2
     exit 0
 fi
-"$PY" "$HERE/verify_meqtl_alleles_against_vcf.py" --vcf "$VCF"
+"$PY" "$HERE/verify_meqtl_alleles_against_vcf.py" \
+    --vcf "$VCF" \
+    --write-out "$HERE/ASM-loci.meQTL.bed"
