@@ -26,6 +26,17 @@ print(f"PYTHONPATH: {os.environ.get('PYTHONPATH')}")
 pl.Config.set_tbl_rows(10)
 
 
+def save_methylation_vs_founder_by_allele(fig, snp_id, outdir="figures"):
+    """Save a methylation-vs-founder plot (colored by meQTL allele) to disk,
+    with a filename that includes the rsID."""
+    os.makedirs(outdir, exist_ok=True)
+    safe_id = (snp_id or "unknown_rsID").replace("/", "_").replace(":", "_")
+    path = os.path.join(outdir, f"methylation_vs_founder.by_allele.{safe_id}.pdf")
+    fig.write_image(path, format="pdf")
+    print(f"  saved {path}")
+    return path
+
+
 def get_parental_df(df_long, mode, parent_type, base_cols):
     meth_col_suffix = f"{mode}_based_meth"
     suffix = f"_{parent_type}"
@@ -183,7 +194,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
             title=f"{title}",
             labels={
                 "founder": "Founder haplotype",
-                "methylation": f"{mode.capitalize()}-based methylation",
+                "methylation": "Haplotype methylation",
             },
             category_orders={"founder": sorted(locus_df["founder"].unique())},
         )
@@ -216,7 +227,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
             title=f"{title}",
             labels={
                 "parent": "Parent of origin",
-                "methylation": f"{mode.capitalize()}-based methylation",
+                "methylation": "Haplotype methylation",
                 "founder": "Founder haplotype",
             },
             category_orders={"parent": ["Father", "Mother"], "founder": haplotypes},
@@ -252,7 +263,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
                 title=f"{title}",
                 labels={
                     "founder": "Founder haplotype",
-                    "methylation": f"{mode.capitalize()}-based methylation",
+                    "methylation": "Haplotype methylation",
                     "allele": f"Allele at {snp_id}" if snp_id else "Allele at meQTL",
                 },
                 category_orders={"founder": sorted(locus_df["founder"].unique())},
@@ -273,3 +284,4 @@ def correlate_methylation_with_haplotypes(mode="count"):
                 yaxis=dict(linecolor="black", gridcolor="lightgray"),
             )
             fig3.show()
+            save_methylation_vs_founder_by_allele(fig3, snp_id)
