@@ -263,14 +263,14 @@ def correlate_methylation_with_haplotypes(mode="count"):
                 labels={
                     "founder": "Haplotype label",
                     "methylation": "Haplotype methylation",
-                    "allele": "Allele",
+                    "allele": "meQTL allele",
                 },
                 category_orders={"founder": sorted(locus_df["founder"].unique())},
             )
             fig3.update_traces(marker_size=25, jitter=0.3, pointpos=0)
             fig3.update_layout(
                 yaxis_range=[0, 1],
-                legend_title="Allele",
+                legend_title="meQTL allele",
                 bargap=0.1,
                 width=1000,
                 height=800,
