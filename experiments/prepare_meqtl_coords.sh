@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-# Driver: derive meQTL coordinates for ASM-loci.bed and verify them against
-# the phased multi-sample VCF.
+# Driver: derive meQTL coordinates for ASM-loci.bed, verify them against the
+# phased multi-sample VCF, and emit per-sample phased alleles at each meQTL
+# for downstream haplotype/methylation analyses.
 #
 # Step 1 (enrich):  ASM-loci.bed  ->  ASM-loci.with-meqtl-coords.bed
 #                   via Ensembl REST (GRCh38). Cached in .ensembl_cache.json.
-# Step 2 (verify):  cross-check REF/ALT at each meqtl_pos against the VCF.
+# Step 2 (verify):  cross-check REF/ALT at each meqtl_pos against the VCF and
+#                   write ASM-loci.meQTL.bed with the cohort-observed ALT.
+# Step 3 (extract): emit meqtl_alleles.tsv with the phased paternal/maternal
+#                   allele for every (sample, meQTL) pair, read from the VCF.
 #
-# Step 1 needs internet; step 2 needs bcftools and read access to the VCF
-# (typically run on the cluster). Set VCF to override the default path.
+# Step 1 needs internet; steps 2 and 3 need bcftools and read access to the
+# VCF (typically run on the cluster). Set VCF to override the default path.
 
 set -euo pipefail
 
