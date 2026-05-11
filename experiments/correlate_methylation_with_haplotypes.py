@@ -193,7 +193,7 @@ def correlate_methylation_with_haplotypes(mode="count"):
             hover_data=["sample"],
             title=f"{title}",
             labels={
-                "founder": "Founder haplotype",
+                "founder": "Haplotype label",
                 "methylation": "Haplotype methylation",
             },
             category_orders={"founder": sorted(locus_df["founder"].unique())},
@@ -260,18 +260,17 @@ def correlate_methylation_with_haplotypes(mode="count"):
                 y="methylation",
                 color="allele",
                 hover_data=["sample", "parent"],
-                title=f"{title}",
                 labels={
-                    "founder": "Founder haplotype",
+                    "founder": "Haplotype label",
                     "methylation": "Haplotype methylation",
-                    "allele": f"Allele at {snp_id}" if snp_id else "Allele at meQTL",
+                    "allele": "Allele",
                 },
                 category_orders={"founder": sorted(locus_df["founder"].unique())},
             )
             fig3.update_traces(marker_size=25, jitter=0.3, pointpos=0)
             fig3.update_layout(
                 yaxis_range=[0, 1],
-                legend_title=f"Allele at {snp_id}" if snp_id else "Allele at meQTL",
+                legend_title="Allele",
                 bargap=0.1,
                 width=1000,
                 height=800,
