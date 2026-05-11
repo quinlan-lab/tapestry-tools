@@ -104,15 +104,36 @@ def correlate_methylation_with_haplotypes(mode="count"):
     # Tidy up
     df_long = df_long.drop("raw_column")
 
+    # Per-sample, per-haplotype allele at each meQTL (produced by
+    # extract_meqtl_alleles_from_vcf.py). Optional: if the file is missing,
+    # skip the meQTL-allele plot rather than failing.
+    alleles_path = "meqtl_alleles.tsv"
+    if os.path.exists(alleles_path):
+        alleles = pl.read_csv(alleles_path, separator="\t")
+    else:
+        alleles = None
+        print(f"  {alleles_path} not found; fig3 (color by meQTL allele) will be skipped")
+
+    def attach_allele(df, hap_col):
+        if alleles is None:
+            return df.with_columns(pl.lit(None).cast(pl.Utf8).alias("allele"))
+        return df.join(
+            alleles.select(
+                ["chrom", "start", "end", "sample", pl.col(hap_col).alias("allele")]
+            ),
+            on=["chrom", "start", "end", "sample"],
+            how="left",
+        )
+
     # Combine Paternal and Maternal data
     final_plot_df = pl.concat(
         [
-            get_parental_df(df_long, mode, "pat", base_cols).with_columns(
-                pl.lit("Father").alias("parent")
-            ),
-            get_parental_df(df_long, mode, "mat", base_cols).with_columns(
-                pl.lit("Mother").alias("parent")
-            ),
+            attach_allele(
+                get_parental_df(df_long, mode, "pat", base_cols), "meqtl_allele_pat"
+            ).with_columns(pl.lit("Father").alias("parent")),
+            attach_allele(
+                get_parental_df(df_long, mode, "mat", base_cols), "meqtl_allele_mat"
+            ).with_columns(pl.lit("Mother").alias("parent")),
         ]
     ).drop_nulls(subset=["methylation", "founder"])
 
@@ -219,3 +240,36 @@ def correlate_methylation_with_haplotypes(mode="count"):
             yaxis=dict(linecolor="black", gridcolor="lightgray"),
         )
         fig2.show()
+
+        # Plot 3: Methylation vs Founder (color by allele at meQTL)
+        if alleles is not None and locus_df["allele"].notna().any():
+            fig3 = px.strip(
+                locus_df.dropna(subset=["allele"]),
+                x="founder",
+                y="methylation",
+                color="allele",
+                hover_data=["sample", "parent"],
+                title=f"{title}",
+                labels={
+                    "founder": "Founder haplotype",
+                    "methylation": f"{mode.capitalize()}-based methylation",
+                    "allele": f"Allele at {snp_id}" if snp_id else "Allele at meQTL",
+                },
+                category_orders={"founder": sorted(locus_df["founder"].unique())},
+            )
+            fig3.update_traces(marker_size=25, jitter=0.3, pointpos=0)
+            fig3.update_layout(
+                yaxis_range=[0, 1],
+                legend_title=f"Allele at {snp_id}" if snp_id else "Allele at meQTL",
+                bargap=0.1,
+                width=1000,
+                height=800,
+                title_y=0.95,
+                title_font_size=30,
+                margin=dict(t=150),
+                plot_bgcolor="white",
+                paper_bgcolor="white",
+                xaxis=dict(linecolor="black", gridcolor="lightgray"),
+                yaxis=dict(linecolor="black", gridcolor="lightgray"),
+            )
+            fig3.show()
