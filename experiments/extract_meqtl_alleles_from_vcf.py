@@ -6,9 +6,9 @@ phased as pat|mat (e.g. CEPH1463 joint call).
 Output: a tidy TSV keyed by locus coordinates (so it joins directly into
 the long methylation frame in correlate_methylation_with_haplotypes.py):
 
-    chrom  start  end  meQTL_id  sample  allele_pat  allele_mat
+    chrom  start  end  meQTL_id  sample  meqtl_allele_pat  meqtl_allele_mat
 
-allele_pat/allele_mat are the actual base strings (e.g. "C", "G"). Rows
+meqtl_allele_pat/meqtl_allele_mat are the actual base strings (e.g. "C", "G"). Rows
 where a sample has an unphased or missing GT at a site are dropped.
 
 Run on a host with bcftools and the VCF visible.
@@ -107,7 +107,7 @@ def main():
 
     n_loci = n_loci_emitted = n_records = 0
     with out_path.open("w") as f:
-        f.write("chrom\tstart\tend\tmeQTL_id\tsample\tallele_pat\tallele_mat\n")
+        f.write("chrom\tstart\tend\tmeQTL_id\tsample\tmeqtl_allele_pat\tmeqtl_allele_mat\n")
         for r in rows:
             if not r.get("meqtl_pos"):
                 continue
