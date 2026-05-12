@@ -1,0 +1,8 @@
+##source="https://www.nature.com/articles/s41467-025-57433-1" 
+#chrom	start	end	meQTL_id	gene	meqtl_pos	meqtl_ref	meqtl_alt	meqtl_note	cohort_alt	cohort_status
+chr2	85584168	85584976	deletion	VAMP5				no_rsid		no_meqtl_pos
+chr6	32664075	32665790	unknown	HLA-DQB1				no_rsid		no_meqtl_pos
+chr3	125990135	125991474	rs12636296	ALG1L	125990207	G	A,T	multiallelic	T	OK_BIALLELIC
+chr4	184100296	184100698	rs12499263	CTCF	184100474	C	A,T	multiallelic	A	OK_BIALLELIC
+chr11	2698400	2701061	rs80269905	KCNQ1	2699643	C	A,G	multiallelic	G	OK_BIALLELIC
+chr1	153617695	153617953	rs9330298	None	153617778	C	A,G,T	multiallelic	A	OK_BIALLELIC
