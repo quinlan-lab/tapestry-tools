@@ -260,8 +260,22 @@ def correlate_methylation_with_haplotypes(mode="count"):
 
         # Plot 3: Methylation vs Founder (color by allele at meQTL)
         if alleles is not None and locus_df["allele"].notna().any():
+            allele_df = locus_df.dropna(subset=["allele"])
+            # Assign red to the higher-methylation allele and blue to the
+            # lower-methylation allele, matching the methylated/unmethylated
+            # colors in Fig 1A/B. Higher-meth allele is listed first in the
+            # legend.
+            allele_means = (
+                allele_df.groupby("allele")["methylation"].mean().sort_values(ascending=False)
+            )
+            allele_order = allele_means.index.tolist()
+            allele_color_map = {
+                allele_order[0]: "#dc2626",  # red — higher methylation
+            }
+            if len(allele_order) > 1:
+                allele_color_map[allele_order[1]] = "#1d4ed8"  # blue — lower methylation
             fig3 = px.strip(
-                locus_df.dropna(subset=["allele"]),
+                allele_df,
                 x="founder",
                 y="methylation",
                 color="allele",
@@ -271,7 +285,11 @@ def correlate_methylation_with_haplotypes(mode="count"):
                     "methylation": "Haplotype methylation",
                     "allele": "meQTL allele",
                 },
-                category_orders={"founder": sorted(locus_df["founder"].unique())},
+                category_orders={
+                    "founder": sorted(allele_df["founder"].unique()),
+                    "allele": allele_order,
+                },
+                color_discrete_map=allele_color_map,
             )
             fig3.update_traces(marker_size=25, jitter=0.3, pointpos=0)
             fig3.update_layout(
